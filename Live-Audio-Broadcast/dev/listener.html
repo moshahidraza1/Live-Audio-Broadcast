@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LiveKit Listener (Dev)</title>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 32px; }
+      label { display: block; margin-top: 12px; font-weight: 600; }
+      input, textarea, button { width: 100%; padding: 10px; margin-top: 6px; }
+      button { width: auto; }
+      #status { margin-top: 16px; font-weight: 600; }
+      audio { margin-top: 16px; width: 100%; }
+    </style>
+  </head>
+  <body>
+    <h1>LiveKit Listener (Dev)</h1>
+    <p>Paste a listener token and LiveKit URL to join and play audio.</p>
+
+    <label for="url">LiveKit URL</label>
+    <input id="url" placeholder="http://localhost:7880" />
+
+    <label for="token">Token</label>
+    <textarea id="token" rows="5" placeholder="Paste token from /api/v1/broadcasts/:id/listener-token"></textarea>
+
+    <button id="connect">Connect & Listen</button>
+    <button id="disconnect" disabled>Disconnect</button>
+
+    <div id="status">Status: idle</div>
+    <div id="audio"></div>
+
+    <script src="https://unpkg.com/livekit-client/dist/livekit-client.umd.js"></script>
+    <script>
+      const statusEl = document.getElementById('status');
+      const connectBtn = document.getElementById('connect');
+      const disconnectBtn = document.getElementById('disconnect');
+      const urlInput = document.getElementById('url');
+      const tokenInput = document.getElementById('token');
+      const audioContainer = document.getElementById('audio');
+
+      let room = null;
+
+      function setStatus(text) {
+        statusEl.textContent = `Status: ${text}`;
+      }
+
+      function attachTrack(track) {
+        const media = track.attach();
+        media.autoplay = true;
+        media.controls = true;
+        audioContainer.innerHTML = '';
+        audioContainer.appendChild(media);
+      }
+
+      connectBtn.addEventListener('click', async () => {
+        const url = urlInput.value.trim();
+        const token = tokenInput.value.trim();
+        if (!url || !token) {
+          setStatus('Missing URL or token');
+          return;
+        }
+
+        try {
+          room = new LivekitClient.Room();
+          room.on(LivekitClient.RoomEvent.TrackPublished, (track) => {
+            if (track?.kind === 'audio') {
+              setStatus('audio track published');
+            }
+          });
+          room.on(LivekitClient.RoomEvent.TrackSubscribed, (track) => {
+            if (track.kind === 'audio') {
+              attachTrack(track);
+            }
+          });
+          room.on(LivekitClient.RoomEvent.TrackUnsubscribed, () => {
+            audioContainer.innerHTML = '';
+          });
+          await room.connect(url, token);
+          setStatus('connected');
+          connectBtn.disabled = true;
+          disconnectBtn.disabled = false;
+        } catch (error) {
+          setStatus(error?.message || 'failed to connect');
+        }
+      });
+
+      disconnectBtn.addEventListener('click', async () => {
+        if (room) {
+          await room.disconnect();
+          room = null;
+        }
+        connectBtn.disabled = false;
+        disconnectBtn.disabled = true;
+        setStatus('disconnected');
+      });
+    </script>
+  </body>
+</html>

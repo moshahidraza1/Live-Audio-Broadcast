@@ -1,0 +1,21 @@
+{
+  "env": {
+    "es2023": true,
+    "node": true
+  },
+  "extends": ["eslint:recommended", "plugin:import/recommended", "prettier"],
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": "latest"
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js"]
+      }
+    }
+  },
+  "rules": {
+    "no-console": "error"
+  }
+}

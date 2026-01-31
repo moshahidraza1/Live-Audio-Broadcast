@@ -1,0 +1,218 @@
+{
+  "info": {
+    "name": "Live Audio Broadcast API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4000/api/v1" },
+    { "key": "accessToken", "value": "" },
+    { "key": "masjidId", "value": "" },
+    { "key": "broadcastId", "value": "" },
+    { "key": "csrfToken", "value": "" },
+    { "key": "hlsExp", "value": "" },
+    { "key": "hlsSig", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth - Register",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Passw0rd!\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Passw0rd!\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Masjid - Request",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": "{{baseUrl}}/masjids/requests",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Masjid Test\",\n  \"latitude\": 24.8607,\n  \"longitude\": 67.0011,\n  \"timezone\": \"Asia/Karachi\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Schedules - Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": "{{baseUrl}}/schedules/{{masjidId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"date\": \"2026-01-17\",\n  \"prayerName\": \"Fajr\",\n  \"adhanTimeLocal\": \"05:30:00\",\n  \"timezone\": \"Asia/Karachi\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Schedules - Template Upsert",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": "{{baseUrl}}/schedules/{{masjidId}}/template",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prayerName\": \"Fajr\",\n  \"adhanTimeLocal\": \"05:30:00\",\n  \"iqamahTimeLocal\": \"05:45:00\",\n  \"timezone\": \"Asia/Kolkata\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Devices - Register Android",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": "{{baseUrl}}/devices",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"deviceId\": \"android-test\",\n  \"fcmToken\": \"test-fcm-token\",\n  \"platform\": \"android\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Devices - Register iOS",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": "{{baseUrl}}/devices",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"deviceId\": \"ios-test\",\n  \"voipToken\": \"test-voip-token\",\n  \"platform\": \"ios\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Broadcasts - Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": "{{baseUrl}}/broadcasts",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"masjidId\": \"{{masjidId}}\",\n  \"prayerName\": \"Fajr\",\n  \"scheduledAt\": \"2026-01-17T00:00:00.000Z\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Broadcasts - List",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": "{{baseUrl}}/broadcasts?masjidId={{masjidId}}&date=2026-01-17"
+      }
+    },
+    {
+      "name": "Broadcasts - Start",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": "{{baseUrl}}/broadcasts/{{broadcastId}}/start",
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        }
+      }
+    },
+    {
+      "name": "Broadcasts - Publisher Token",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": "{{baseUrl}}/broadcasts/{{broadcastId}}/token"
+      }
+    },
+    {
+      "name": "Broadcasts - Listener Token",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": "{{baseUrl}}/broadcasts/{{broadcastId}}/listener-token"
+      }
+    },
+    {
+      "name": "Broadcasts - End",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": "{{baseUrl}}/broadcasts/{{broadcastId}}/end",
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        }
+      }
+    },
+    {
+      "name": "Auth - Refresh",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+        ],
+        "url": "{{baseUrl}}/auth/refresh"
+      }
+    },
+    {
+      "name": "Auth - Logout",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+        ],
+        "url": "{{baseUrl}}/auth/logout"
+      }
+    },
+    {
+      "name": "Broadcasts - HLS Asset",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/broadcasts/{{broadcastId}}/hls/index.m3u8?exp={{hlsExp}}&sig={{hlsSig}}"
+      }
+    }
+  ]
+}
